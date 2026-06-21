@@ -20,7 +20,7 @@
     }
     .game {
       width: 100%;
-      max-width: 860px;
+      max-width: 900px;
       background: rgba(255,255,255,0.97);
       border-radius: 28px;
       padding: 14px;
@@ -36,12 +36,14 @@
       flex-wrap: wrap;
       margin-bottom: 10px;
     }
-    .left-pills, .right-pills {
+    .left-pills, .right-pills, .theme-row {
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
       align-items: center;
+      justify-content: center;
     }
+    .theme-row { margin-top: 14px; }
     .pill {
       padding: 10px 14px;
       border-radius: 999px;
@@ -52,7 +54,7 @@
     }
     .pill.hearts { background: #ffe3e3; }
     .pill.game-name { background: #d0ebff; min-width: 120px; }
-    .icon-btn {
+    .icon-btn, .theme-btn, .sound-btn {
       border: none;
       background: #74c0fc;
       color: white;
@@ -62,6 +64,7 @@
       padding: 10px 16px;
       cursor: pointer;
     }
+    .theme-btn.active, .sound-btn.active { background: #51cf66; }
     .start-screen, .scene {
       background: linear-gradient(180deg, #eefcff 0%, #ffffff 100%);
       border-radius: 24px;
@@ -75,6 +78,7 @@
     .big-row {
       font-size: 48px;
       margin: 12px 0 14px;
+      min-height: 58px;
     }
     .start-btn {
       border: none;
@@ -98,7 +102,7 @@
       background: linear-gradient(180deg, #b2f2ff 0%, #d0f4de 60%, #b7e4a3 100%);
       border-radius: 24px;
       padding: 14px 12px 18px;
-      min-height: 420px;
+      min-height: 430px;
       overflow: hidden;
     }
     .message {
@@ -184,7 +188,7 @@
     .play-area {
       position: relative;
       width: 100%;
-      height: 280px;
+      height: 290px;
       border-radius: 22px;
       background: linear-gradient(180deg, #c5f6fa 0%, #d8f5a2 100%);
       overflow: hidden;
@@ -204,6 +208,7 @@
       align-items: center;
       cursor: pointer;
       user-select: none;
+      transition: transform 0.08s linear;
     }
     .burst {
       position: absolute;
@@ -213,6 +218,14 @@
     }
     .reward-screen { padding-top: 10px; }
     .reward-big { font-size: 82px; margin-bottom: 8px; }
+    .unlock-row {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 10px 0 14px;
+      font-size: 34px;
+    }
     @keyframes bounce {
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-6px); }
@@ -225,8 +238,8 @@
     @media (max-width: 640px) {
       .title { font-size: 32px; }
       .big-row { font-size: 40px; }
-      .pill { font-size: 19px; }
-      .stage { min-height: 430px; }
+      .pill, .theme-btn, .sound-btn { font-size: 18px; }
+      .stage { min-height: 440px; }
       .animal-card { width: 150px; height: 150px; }
       .animal-emoji { font-size: 88px; }
       .want-bubble { min-width: 74px; min-height: 74px; font-size: 44px; }
@@ -234,7 +247,7 @@
       .food-emoji { font-size: 64px; }
       .message { font-size: 28px; }
       .floating { width: 70px; height: 70px; font-size: 40px; }
-      .play-area { height: 260px; }
+      .play-area { height: 270px; }
     }
   </style>
 </head>
@@ -246,6 +259,7 @@
         <div class="pill hearts">❤️ <span id="lives">3</span></div>
       </div>
       <div class="right-pills">
+        <button id="soundBtn" class="sound-btn active">🔊</button>
         <div class="pill game-name" id="gameLabel">🎮</div>
         <button id="restartBtn" class="icon-btn">↻</button>
       </div>
@@ -253,9 +267,10 @@
 
     <div id="startScreen" class="start-screen">
       <h1 class="title">Весёлый парк</h1>
-      <div class="big-row">🐰 🎈 ⭐ 🐵 🫧 🐻</div>
+      <div class="big-row" id="themePreview">🐰 🎈 ⭐ 🐵 🫧 🐻</div>
       <button id="startBtn" class="start-btn">▶ ИГРАТЬ</button>
       <div class="hint">Три игры подряд: корми, лопай, собирай</div>
+      <div class="theme-row" id="themeRow"></div>
     </div>
 
     <div id="playScreen" class="scene" style="display:none;">
@@ -270,21 +285,79 @@
   </div>
 
   <script>
-    const animals = [
-      { emoji: '🐰', food: '🥕' },
-      { emoji: '🐵', food: '🍌' },
-      { emoji: '🐻', food: '🍯' },
-      { emoji: '🐶', food: '🦴' },
-      { emoji: '🐱', food: '🐟' },
-      { emoji: '🐭', food: '🧀' },
-      { emoji: '🐼', food: '🎋' },
-      { emoji: '🦊', food: '🍗' }
-    ];
-    const extraFoods = ['🍎','🍓','🍪','🥒','🍰','🥥','🌽','🥔','🍕','🥨'];
-    const balloonsGood = ['🎈','🫧','🎈','🫧','⭐'];
-    const balloonsBad = ['💨','☁️'];
-    const starsGood = ['⭐','🌟','✨'];
-    const starsBad = ['☁️','💨','🍂'];
+    const themes = {
+      animals: {
+        label: '🐰',
+        preview: '🐰 🎈 ⭐ 🐵 🫧 🐻',
+        feedPairs: [
+          { hero: '🐰', target: '🥕' },
+          { hero: '🐵', target: '🍌' },
+          { hero: '🐻', target: '🍯' },
+          { hero: '🐶', target: '🦴' },
+          { hero: '🐱', target: '🐟' },
+          { hero: '🐭', target: '🧀' },
+          { hero: '🐼', target: '🎋' },
+          { hero: '🦊', target: '🍗' }
+        ],
+        distractors: ['🍎','🍓','🍪','🥒','🍰','🥥','🌽','🥔','🍕','🥨'],
+        popGood: ['🎈','🫧','🎈','🫧','⭐'],
+        popBad: ['💨','☁️'],
+        collectGood: ['⭐','🌟','✨'],
+        collectBad: ['☁️','💨','🍂'],
+        unlocks: ['🦁','🐯','🦄']
+      },
+      cars: {
+        label: '🚗',
+        preview: '🚗 🛞 ⭐ 🚙 ⛽ 🏎️',
+        feedPairs: [
+          { hero: '🚗', target: '⛽' },
+          { hero: '🚙', target: '🛞' },
+          { hero: '🏎️', target: '🏁' },
+          { hero: '🚕', target: '🔧' },
+          { hero: '🚓', target: '🪫' },
+          { hero: '🚑', target: '🧰' }
+        ],
+        distractors: ['🍎','🌂','🎁','🪥','🎲','🧁','🧸','📦'],
+        popGood: ['🚗','🛞','⭐','🏎️'],
+        popBad: ['💨','☁️'],
+        collectGood: ['⭐','🏁','✨'],
+        collectBad: ['☁️','🪨','💨'],
+        unlocks: ['🚜','🚒','🛻']
+      },
+      dino: {
+        label: '🦖',
+        preview: '🦖 🥚 ⭐ 🦕 🌋 🍃',
+        feedPairs: [
+          { hero: '🦖', target: '🍖' },
+          { hero: '🦕', target: '🍃' },
+          { hero: '🐣', target: '🥚' },
+          { hero: '🦴', target: '🪨' }
+        ],
+        distractors: ['🍰','🌽','🍎','🧁','🎈','🥥','🍕','🎲'],
+        popGood: ['🫧','🥚','⭐','🌋'],
+        popBad: ['☄️','💨'],
+        collectGood: ['⭐','✨','🦴'],
+        collectBad: ['☁️','💨','🌪️'],
+        unlocks: ['🐉','🦖','🌟']
+      },
+      princess: {
+        label: '👑',
+        preview: '👑 🎀 ⭐ 🪄 💎 🏰',
+        feedPairs: [
+          { hero: '👸', target: '👑' },
+          { hero: '🦄', target: '🌈' },
+          { hero: '🧚', target: '🪄' },
+          { hero: '🐸', target: '💋' }
+        ],
+        distractors: ['🍎','🥒','🎲','🧸','🥥','📦','🪥','🍪'],
+        popGood: ['🎈','💎','⭐','🫧'],
+        popBad: ['☁️','💨'],
+        collectGood: ['⭐','✨','💖'],
+        collectBad: ['☁️','💨','🍂'],
+        unlocks: ['🏰','💎','🪄']
+      }
+    };
+
     const gameFlow = ['feed', 'balloons', 'stars'];
 
     const scoreEl = document.getElementById('score');
@@ -292,6 +365,7 @@
     const gameLabelEl = document.getElementById('gameLabel');
     const restartBtn = document.getElementById('restartBtn');
     const startBtn = document.getElementById('startBtn');
+    const soundBtn = document.getElementById('soundBtn');
     const startScreen = document.getElementById('startScreen');
     const playScreen = document.getElementById('playScreen');
     const stageEl = document.getElementById('stage');
@@ -299,15 +373,28 @@
     const progressDotsEl = document.getElementById('progressDots');
     const gameContentEl = document.getElementById('gameContent');
     const rewardScreenEl = document.getElementById('rewardScreen');
+    const themeRowEl = document.getElementById('themeRow');
+    const themePreviewEl = document.getElementById('themePreview');
 
     let score = 0;
     let lives = 3;
     let gameIndex = 0;
     let phaseStep = 0;
-    let currentAnimal = null;
+    let currentPair = null;
     let locked = false;
     let activeTimers = [];
-    let activeIntervals = [];
+    let isRunning = false;
+    let soundOn = true;
+    let currentTheme = 'animals';
+    let unlocked = JSON.parse(localStorage.getItem('kid_game_unlocks') || '[]');
+
+    function currentThemeData() {
+      return themes[currentTheme];
+    }
+
+    function saveUnlocks() {
+      localStorage.setItem('kid_game_unlocks', JSON.stringify(unlocked));
+    }
 
     function shuffle(array) {
       return [...array].sort(() => Math.random() - 0.5);
@@ -321,7 +408,9 @@
       scoreEl.textContent = score;
       livesEl.textContent = lives;
       const labels = { feed: '🍎', balloons: '🎈', stars: '⭐' };
-      gameLabelEl.textContent = labels[gameFlow[gameIndex]] || '🎮';
+      gameLabelEl.textContent = labels[gameFlow[gameIndex]] || themes[currentTheme].label;
+      soundBtn.classList.toggle('active', soundOn);
+      soundBtn.textContent = soundOn ? '🔊' : '🔈';
     }
 
     function setMessage(text, color = '#333') {
@@ -329,21 +418,15 @@
       messageEl.style.color = color;
     }
 
-    function clearAsync() {
+    function clearTimers() {
       activeTimers.forEach(clearTimeout);
-      activeIntervals.forEach(clearInterval);
       activeTimers = [];
-      activeIntervals = [];
     }
 
     function later(fn, ms) {
       const id = setTimeout(fn, ms);
       activeTimers.push(id);
-    }
-
-    function every(fn, ms) {
-      const id = setInterval(fn, ms);
-      activeIntervals.push(id);
+      return id;
     }
 
     function renderDots(total, done) {
@@ -365,10 +448,55 @@
       later(() => el.remove(), 800);
     }
 
+    function beep(freq, duration, type = 'sine', volume = 0.03) {
+      if (!soundOn) return;
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      if (!window.__kidAudio) window.__kidAudio = new AudioCtx();
+      const ctx = window.__kidAudio;
+      if (ctx.state === 'suspended') ctx.resume();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = type;
+      osc.frequency.value = freq;
+      gain.gain.value = volume;
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + duration / 1000);
+    }
+
+    function playGood() {
+      beep(660, 90); later(() => beep(880, 120), 80);
+    }
+
+    function playBad() {
+      beep(220, 140, 'square', 0.025);
+    }
+
+    function renderThemes() {
+      themeRowEl.innerHTML = '';
+      Object.entries(themes).forEach(([key, data]) => {
+        const btn = document.createElement('button');
+        btn.className = 'theme-btn' + (key === currentTheme ? ' active' : '');
+        btn.textContent = data.label;
+        btn.addEventListener('click', () => {
+          currentTheme = key;
+          themePreviewEl.textContent = data.preview;
+          renderThemes();
+          updateHud();
+        });
+        themeRowEl.appendChild(btn);
+      });
+      themePreviewEl.textContent = themes[currentTheme].preview;
+    }
+
     function loseLife() {
+      if (!isRunning) return true;
       lives -= 1;
       if (lives < 0) lives = 0;
       updateHud();
+      playBad();
       burst('💨');
       if (lives <= 0) {
         finishAll(false);
@@ -378,6 +506,7 @@
     }
 
     function nextGameOrFinish() {
+      if (!isRunning) return;
       gameIndex += 1;
       phaseStep = 0;
       if (gameIndex >= gameFlow.length) {
@@ -388,7 +517,8 @@
     }
 
     function startCurrentGame() {
-      clearAsync();
+      if (!isRunning) return;
+      clearTimers();
       locked = false;
       rewardScreenEl.style.display = 'none';
       rewardScreenEl.innerHTML = '';
@@ -404,29 +534,31 @@
     function startFeedGame() {
       renderDots(4, phaseStep);
       setMessage('🍎', '#2f9e44');
-      currentAnimal = randomItem(animals);
-      const choices = shuffle([currentAnimal.food, ...shuffle(extraFoods).slice(0, 3)]);
+      const data = currentThemeData();
+      currentPair = randomItem(data.feedPairs);
+      const choices = shuffle([currentPair.target, ...shuffle(data.distractors).slice(0, 3)]);
 
       gameContentEl.innerHTML = `
         <div class="animal-wrap">
-          <div class="animal-card"><div class="animal-emoji">${currentAnimal.emoji}</div></div>
-          <div class="want-bubble">${currentAnimal.food}</div>
+          <div class="animal-card"><div class="animal-emoji">${currentPair.hero}</div></div>
+          <div class="want-bubble">${currentPair.target}</div>
         </div>
         <div class="foods" id="foods"></div>
       `;
 
       const foodsEl = document.getElementById('foods');
-      choices.forEach((food) => {
+      choices.forEach((item) => {
         const btn = document.createElement('button');
         btn.className = 'food';
-        btn.innerHTML = `<span class="food-emoji">${food}</span>`;
+        btn.innerHTML = `<span class="food-emoji">${item}</span>`;
         btn.addEventListener('click', () => {
-          if (locked) return;
-          if (food === currentAnimal.food) {
+          if (!isRunning || locked) return;
+          if (item === currentPair.target) {
             locked = true;
             score += 2;
             updateHud();
             btn.classList.add('correct');
+            playGood();
             burst('⭐');
             phaseStep += 1;
             if (phaseStep >= 4) {
@@ -442,7 +574,7 @@
             setMessage('🙂', '#e8590c');
             later(() => {
               btn.classList.remove('wrong');
-              setMessage('🍎', '#2f9e44');
+              if (isRunning) setMessage('🍎', '#2f9e44');
             }, 350);
             loseLife();
           }
@@ -451,55 +583,113 @@
       });
     }
 
+    function animateFloating(button, config) {
+      const area = button.parentElement;
+      let x = config.x;
+      let y = config.y;
+      let vx = config.vx;
+      let vy = config.vy;
+      let alive = true;
+
+      function step() {
+        if (!isRunning || !alive || !button.isConnected || !area) return;
+        const maxX = Math.max(0, area.clientWidth - button.offsetWidth);
+        const maxY = Math.max(0, area.clientHeight - button.offsetHeight);
+        x += vx;
+        y += vy;
+        if (x <= 0 || x >= maxX) vx *= -1;
+        if (y <= 0 || y >= maxY) vy *= -1;
+        x = Math.max(0, Math.min(maxX, x));
+        y = Math.max(0, Math.min(maxY, y));
+        button.style.left = `${x}px`;
+        button.style.top = `${y}px`;
+        const id = requestAnimationFrame(step);
+        button.__raf = id;
+      }
+
+      button.__stopMotion = () => {
+        alive = false;
+        if (button.__raf) cancelAnimationFrame(button.__raf);
+      };
+
+      step();
+    }
+
+    function spawnMovingItem(area, emoji, good, onResolved) {
+      const btn = document.createElement('button');
+      btn.className = 'floating';
+      btn.textContent = emoji;
+      btn.style.left = '0px';
+      btn.style.top = '0px';
+      area.appendChild(btn);
+
+      animateFloating(btn, {
+        x: Math.random() * Math.max(20, area.clientWidth - 90),
+        y: Math.random() * Math.max(20, area.clientHeight - 90),
+        vx: (Math.random() * 1.8 + 0.8) * (Math.random() > 0.5 ? 1 : -1),
+        vy: (Math.random() * 1.6 + 0.7) * (Math.random() > 0.5 ? 1 : -1)
+      });
+
+      let resolved = false;
+      function resolve(result) {
+        if (resolved) return;
+        resolved = true;
+        if (btn.__stopMotion) btn.__stopMotion();
+        if (btn.isConnected) btn.remove();
+        onResolved(result);
+      }
+
+      btn.addEventListener('click', () => resolve(good ? 'good' : 'bad'));
+      later(() => resolve('miss'), 2200);
+    }
+
     function startBalloonGame() {
       renderDots(8, phaseStep);
       setMessage('🎈', '#d6336c');
       gameContentEl.innerHTML = `<div class="play-area" id="playArea"></div>`;
       const area = document.getElementById('playArea');
       let spawned = 0;
-      let poppedGood = 0;
+      let resolvedCount = 0;
+      let goodHits = 0;
 
-      function spawnBalloon() {
-        if (spawned >= 8 || lives <= 0 || gameFlow[gameIndex] !== 'balloons') return;
-        spawned += 1;
-        const good = Math.random() > 0.25;
-        const emoji = good ? randomItem(balloonsGood) : randomItem(balloonsBad);
-        const btn = document.createElement('button');
-        btn.className = 'floating';
-        btn.textContent = emoji;
-        btn.style.left = `${Math.random() * 78}%`;
-        btn.style.top = `${10 + Math.random() * 60}%`;
-        area.appendChild(btn);
-
-        btn.addEventListener('click', () => {
-          if (!btn.isConnected) return;
-          btn.remove();
-          if (good) {
-            score += 1;
-            poppedGood += 1;
-            phaseStep = poppedGood;
-            updateHud();
-            renderDots(8, phaseStep);
-            burst('🎉', 50, 55);
-            if (poppedGood >= 8) {
-              clearAsync();
-              later(nextGameOrFinish, 700);
-            }
-          } else {
-            burst('💨', 50, 55);
-            loseLife();
-          }
-        });
-
-        later(() => {
-          if (btn.isConnected) btn.remove();
-          if (spawned < 8 && gameFlow[gameIndex] === 'balloons') spawnBalloon();
-          else if (spawned >= 8 && poppedGood >= 8) later(nextGameOrFinish, 500);
-        }, 1400);
+      function maybeContinue() {
+        if (!isRunning) return;
+        if (goodHits >= 8) {
+          later(nextGameOrFinish, 600);
+          return;
+        }
+        if (resolvedCount >= 10) {
+          later(nextGameOrFinish, 600);
+          return;
+        }
+        spawnNext();
       }
 
-      every(spawnBalloon, 800);
-      spawnBalloon();
+      function spawnNext() {
+        if (!isRunning || gameFlow[gameIndex] !== 'balloons') return;
+        if (spawned >= 10) return;
+        spawned += 1;
+        const good = Math.random() > 0.25;
+        const emoji = good ? randomItem(currentThemeData().popGood) : randomItem(currentThemeData().popBad);
+        spawnMovingItem(area, emoji, good, (result) => {
+          if (!isRunning) return;
+          resolvedCount += 1;
+          if (result === 'good') {
+            score += 1;
+            goodHits += 1;
+            phaseStep = goodHits;
+            updateHud();
+            renderDots(8, phaseStep);
+            playGood();
+            burst('🎉', 50, 55);
+          } else if (result === 'bad') {
+            loseLife();
+          }
+          maybeContinue();
+        });
+      }
+
+      spawnNext();
     }
 
     function startStarGame() {
@@ -507,62 +697,74 @@
       setMessage('⭐', '#f59f00');
       gameContentEl.innerHTML = `<div class="play-area" id="playArea"></div>`;
       const area = document.getElementById('playArea');
-      let shown = 0;
-      let caught = 0;
+      let spawned = 0;
+      let resolvedCount = 0;
+      let goodHits = 0;
 
-      function spawnStar() {
-        if (shown >= 10 || lives <= 0 || gameFlow[gameIndex] !== 'stars') return;
-        shown += 1;
-        const good = Math.random() > 0.3;
-        const emoji = good ? randomItem(starsGood) : randomItem(starsBad);
-        const btn = document.createElement('button');
-        btn.className = 'floating';
-        btn.textContent = emoji;
-        btn.style.left = `${Math.random() * 78}%`;
-        btn.style.top = `${8 + Math.random() * 62}%`;
-        area.appendChild(btn);
-
-        btn.addEventListener('click', () => {
-          if (!btn.isConnected) return;
-          btn.remove();
-          if (good) {
-            score += 1;
-            caught += 1;
-            phaseStep = caught;
-            updateHud();
-            renderDots(10, phaseStep);
-            burst('⭐', 50, 55);
-            if (caught >= 10) {
-              clearAsync();
-              later(() => finishAll(true), 700);
-            }
-          } else {
-            burst('💨', 50, 55);
-            loseLife();
-          }
-        });
-
-        later(() => {
-          if (btn.isConnected) btn.remove();
-          if (shown >= 10 && caught >= 10) later(() => finishAll(true), 500);
-        }, 1300);
+      function maybeContinue() {
+        if (!isRunning) return;
+        if (goodHits >= 10) {
+          later(() => finishAll(true), 650);
+          return;
+        }
+        if (resolvedCount >= 12) {
+          later(() => finishAll(true), 650);
+          return;
+        }
+        spawnNext();
       }
 
-      every(spawnStar, 700);
-      spawnStar();
+      function spawnNext() {
+        if (!isRunning || gameFlow[gameIndex] !== 'stars') return;
+        if (spawned >= 12) return;
+        spawned += 1;
+        const good = Math.random() > 0.3;
+        const emoji = good ? randomItem(currentThemeData().collectGood) : randomItem(currentThemeData().collectBad);
+        spawnMovingItem(area, emoji, good, (result) => {
+          if (!isRunning) return;
+          resolvedCount += 1;
+          if (result === 'good') {
+            score += 1;
+            goodHits += 1;
+            phaseStep = goodHits;
+            updateHud();
+            renderDots(10, phaseStep);
+            playGood();
+            burst('⭐', 50, 55);
+          } else if (result === 'bad') {
+            loseLife();
+          }
+          maybeContinue();
+        });
+      }
+
+      spawnNext();
+    }
+
+    function applyUnlocks() {
+      const toUnlock = currentThemeData().unlocks.filter((item) => !unlocked.includes(item));
+      if (score >= 10 && toUnlock.length) {
+        unlocked.push(toUnlock[0]);
+        saveUnlocks();
+        return [toUnlock[0]];
+      }
+      return [];
     }
 
     function finishAll(win) {
-      clearAsync();
+      clearTimers();
+      isRunning = false;
       locked = true;
       gameContentEl.innerHTML = '';
       renderDots(3, win ? 3 : gameIndex);
       setMessage(win ? '🎉' : '💛', win ? '#2f9e44' : '#e67700');
 
       const reward = score >= 18 ? '🏆' : score >= 12 ? '🥇' : score >= 8 ? '🥈' : '🥉';
+      const newUnlocks = win ? applyUnlocks() : [];
       rewardScreenEl.style.display = 'block';
       rewardScreenEl.innerHTML = `
         <div class="reward-big">${win ? reward : '🙂'}</div>
+        <div class="unlock-row">${newUnlocks.concat(unlocked.slice(-3)).map(x => `<span>${x}</span>`).join('')}</div>
         <button id="playAgainBtn" class="start-btn">▶ ЕЩЁ</button>
       `;
       document.getElementById('playAgainBtn').addEventListener('click', startGame);
@@ -573,20 +775,28 @@
     }
 
     function startGame() {
-      clearAsync();
+      clearTimers();
       score = 0;
       lives = 3;
       gameIndex = 0;
       phaseStep = 0;
+      currentPair = null;
       locked = false;
+      isRunning = true;
       startScreen.style.display = 'none';
       playScreen.style.display = 'block';
       updateHud();
       startCurrentGame();
     }
 
+    soundBtn.addEventListener('click', () => {
+      soundOn = !soundOn;
+      updateHud();
+    });
     startBtn.addEventListener('click', startGame);
     restartBtn.addEventListener('click', startGame);
+
+    renderThemes();
     updateHud();
     renderDots(3, 0);
   </script>
