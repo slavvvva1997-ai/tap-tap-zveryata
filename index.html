@@ -3,181 +3,71 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Тап-Тап Зверята</title>
+  <title>Покорми зверят</title>
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: linear-gradient(180deg, #8fd3ff 0%, #dff9ff 45%, #fff5c4 100%);
+      background: linear-gradient(180deg, #92d8ff 0%, #e9fbff 45%, #fff0b3 100%);
       min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 12px;
+      padding: 10px;
       color: #2d2d2d;
       touch-action: manipulation;
     }
 
     .game {
       width: 100%;
-      max-width: 760px;
-      background: rgba(255, 255, 255, 0.96);
+      max-width: 820px;
+      background: rgba(255,255,255,0.97);
       border-radius: 28px;
-      padding: 16px;
-      box-shadow: 0 12px 30px rgba(0,0,0,0.14);
+      padding: 14px;
+      box-shadow: 0 14px 34px rgba(0,0,0,0.14);
       text-align: center;
+      overflow: hidden;
     }
 
     .topbar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 10px;
-      margin-bottom: 10px;
+      gap: 8px;
       flex-wrap: wrap;
+      margin-bottom: 10px;
     }
 
-    .stars {
+    .pill {
+      padding: 10px 14px;
+      border-radius: 999px;
       font-size: 22px;
       font-weight: bold;
       background: #fff3b0;
-      border-radius: 999px;
-      padding: 10px 16px;
-      min-width: 120px;
+      min-width: 90px;
     }
 
-    .mini-btn {
+    .pill.hearts {
+      background: #ffe3e3;
+    }
+
+    .icon-btn {
       border: none;
       background: #74c0fc;
       color: white;
-      font-size: 18px;
+      font-size: 20px;
       font-weight: bold;
       border-radius: 16px;
       padding: 10px 16px;
       cursor: pointer;
     }
 
-    .scene {
+    .start-screen, .scene {
       background: linear-gradient(180deg, #eefcff 0%, #ffffff 100%);
       border-radius: 24px;
-      padding: 14px 12px 18px;
-    }
-
-    .helper {
-      font-size: 42px;
-      margin-bottom: 8px;
-      animation: bounce 1.2s infinite;
-    }
-
-    .goal-wrap {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 16px;
-      flex-wrap: wrap;
-    }
-
-    .goal-label {
-      font-size: 22px;
-      font-weight: bold;
-    }
-
-    .goal-card {
-      width: 170px;
-      height: 170px;
-      border-radius: 26px;
-      background: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      box-shadow: 0 10px 22px rgba(0,0,0,0.10);
-      border: 6px solid #ffd43b;
-      margin: 0 auto 8px;
-    }
-
-    .goal-emoji {
-      font-size: 96px;
-      line-height: 1;
-    }
-
-    .arrow {
-      font-size: 40px;
-      font-weight: bold;
-      color: #ff922b;
-      margin-bottom: 10px;
-    }
-
-    .options {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 14px;
-      margin-top: 8px;
-    }
-
-    .option {
-      border: none;
-      border-radius: 24px;
-      min-height: 150px;
-      background: #f8f9fa;
-      box-shadow: 0 8px 18px rgba(0,0,0,0.10);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      cursor: pointer;
-      transition: transform 0.12s ease, box-shadow 0.12s ease;
-      padding: 8px;
-    }
-
-    .option:active {
-      transform: scale(0.97);
-    }
-
-    .option.correct {
-      background: #d3f9d8;
-    }
-
-    .option.wrong {
-      background: #ffe3e3;
-    }
-
-    .option-emoji {
-      font-size: 82px;
-      line-height: 1;
-      user-select: none;
-      pointer-events: none;
-    }
-
-    .message {
-      min-height: 52px;
-      font-size: 34px;
-      font-weight: bold;
-      margin-top: 14px;
-    }
-
-    .progress-dots {
-      display: flex;
-      justify-content: center;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-top: 14px;
-    }
-
-    .dot {
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      background: #dee2e6;
-    }
-
-    .dot.done {
-      background: #ffd43b;
-    }
-
-    .start-screen {
-      padding: 18px 8px 8px;
+      padding: 18px 12px;
     }
 
     .title {
@@ -186,9 +76,9 @@
       margin: 0 0 8px;
     }
 
-    .big-emoji-row {
+    .big-row {
       font-size: 48px;
-      margin: 10px 0 16px;
+      margin: 12px 0 14px;
     }
 
     .start-btn {
@@ -199,15 +89,161 @@
       font-weight: bold;
       border-radius: 24px;
       padding: 18px 28px;
-      min-width: 220px;
+      min-width: 230px;
       cursor: pointer;
       box-shadow: 0 10px 18px rgba(0,0,0,0.14);
     }
 
-    .small-help {
-      font-size: 18px;
-      color: #666;
+    .hint {
       margin-top: 14px;
+      font-size: 20px;
+      color: #666;
+    }
+
+    .stage {
+      position: relative;
+      background: linear-gradient(180deg, #b2f2ff 0%, #d0f4de 60%, #b7e4a3 100%);
+      border-radius: 24px;
+      padding: 16px 12px 20px;
+      min-height: 290px;
+      overflow: hidden;
+    }
+
+    .helper {
+      font-size: 36px;
+      animation: bounce 1s infinite;
+      margin-bottom: 4px;
+    }
+
+    .animal-wrap {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .animal-card {
+      width: 190px;
+      height: 190px;
+      border-radius: 30px;
+      background: rgba(255,255,255,0.95);
+      box-shadow: 0 10px 24px rgba(0,0,0,0.10);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: 6px solid #ffd43b;
+      position: relative;
+    }
+
+    .animal-emoji {
+      font-size: 110px;
+      line-height: 1;
+    }
+
+    .want-bubble {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      min-width: 90px;
+      min-height: 90px;
+      background: white;
+      border-radius: 999px;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+      font-size: 54px;
+      border: 4px solid #fab005;
+    }
+
+    .progress-row {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+      margin-bottom: 10px;
+    }
+
+    .dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #ced4da;
+    }
+
+    .dot.done {
+      background: #ffd43b;
+    }
+
+    .foods {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin-top: 8px;
+    }
+
+    .food {
+      border: none;
+      border-radius: 24px;
+      min-height: 130px;
+      background: #fff;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.10);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: transform 0.12s ease;
+      padding: 8px;
+      position: relative;
+    }
+
+    .food:active {
+      transform: scale(0.97);
+    }
+
+    .food.correct {
+      background: #d3f9d8;
+    }
+
+    .food.wrong {
+      background: #ffe3e3;
+    }
+
+    .food-emoji {
+      font-size: 78px;
+      line-height: 1;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    .message {
+      min-height: 44px;
+      font-size: 34px;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    .combo {
+      font-size: 24px;
+      font-weight: bold;
+      color: #f08c00;
+      min-height: 30px;
+    }
+
+    .burst {
+      position: absolute;
+      font-size: 38px;
+      animation: pop 0.8s ease forwards;
+      pointer-events: none;
+    }
+
+    .reward-screen {
+      padding: 10px 0 0;
+    }
+
+    .reward-big {
+      font-size: 80px;
+      margin-bottom: 8px;
     }
 
     @keyframes bounce {
@@ -215,65 +251,99 @@
       50% { transform: translateY(-6px); }
     }
 
+    @keyframes pop {
+      0% { transform: translateY(0) scale(0.8); opacity: 0; }
+      30% { opacity: 1; }
+      100% { transform: translateY(-50px) scale(1.2); opacity: 0; }
+    }
+
     @media (max-width: 640px) {
       .title { font-size: 32px; }
-      .goal-card { width: 150px; height: 150px; }
-      .goal-emoji { font-size: 82px; }
-      .option { min-height: 130px; }
-      .option-emoji { font-size: 72px; }
+      .big-row { font-size: 42px; }
+      .animal-card { width: 160px; height: 160px; }
+      .animal-emoji { font-size: 92px; }
+      .want-bubble { min-width: 78px; min-height: 78px; font-size: 46px; }
+      .food { min-height: 118px; }
+      .food-emoji { font-size: 68px; }
       .message { font-size: 28px; }
-      .goal-label { font-size: 20px; }
+      .pill { font-size: 20px; }
+      .combo { font-size: 22px; }
     }
   </style>
 </head>
 <body>
   <div class="game">
     <div class="topbar">
-      <div class="stars">⭐ <span id="score">0</span></div>
-      <button id="restartBtn" class="mini-btn">↻</button>
+      <div class="pill">⭐ <span id="score">0</span></div>
+      <div class="pill hearts">❤️ <span id="lives">3</span></div>
+      <div class="pill">🔥 <span id="combo">0</span></div>
+      <button id="restartBtn" class="icon-btn">↻</button>
     </div>
 
     <div id="startScreen" class="start-screen">
-      <h1 class="title">Тап-Тап Зверята</h1>
-      <div class="big-emoji-row">🐶 🐱 🐸 🐰 ⭐</div>
+      <h1 class="title">Покорми зверят</h1>
+      <div class="big-row">🐰 🐵 🐻 🐶 🍎 🍌 🥕</div>
       <button id="startBtn" class="start-btn">▶ ИГРАТЬ</button>
-      <div class="small-help">Нажимай на такую же картинку</div>
+      <div class="hint">Зверёк ждёт еду. Нажми на правильную.</div>
     </div>
 
     <div id="playScreen" class="scene" style="display:none;">
-      <div class="helper">👇</div>
-      <div class="goal-wrap">
-        <div class="goal-label">Найди такую же</div>
+      <div class="stage" id="stage">
+        <div class="helper">👇</div>
+        <div class="animal-wrap">
+          <div class="animal-card">
+            <div id="animalEmoji" class="animal-emoji">🐰</div>
+          </div>
+          <div id="wantEmoji" class="want-bubble">🥕</div>
+        </div>
+        <div id="message" class="message"></div>
+        <div id="comboMessage" class="combo"></div>
+        <div id="progressDots" class="progress-row"></div>
       </div>
-      <div class="goal-card">
-        <div id="goalEmoji" class="goal-emoji">🐶</div>
-      </div>
-      <div class="arrow">⬇</div>
-      <div id="options" class="options"></div>
-      <div id="message" class="message"></div>
-      <div id="progressDots" class="progress-dots"></div>
+      <div id="foods" class="foods"></div>
+      <div id="rewardScreen" class="reward-screen" style="display:none;"></div>
     </div>
   </div>
 
   <script>
-    const items = ['🐶','🐱','🐭','🐸','🐰','🦊','🐻','🐼','🐵','🦁','🐷','🐹','🚗','🦋','🌈','⭐','🍎','🍌'];
-    const successMessages = ['⭐', '🎉', '👏', '😊', '🌟'];
-    const failMessages = ['🙂', '👆', '🔄'];
+    const animals = [
+      { emoji: '🐰', food: '🥕' },
+      { emoji: '🐵', food: '🍌' },
+      { emoji: '🐻', food: '🍯' },
+      { emoji: '🐶', food: '🦴' },
+      { emoji: '🐱', food: '🐟' },
+      { emoji: '🐭', food: '🧀' },
+      { emoji: '🐼', food: '🎋' },
+      { emoji: '🦊', food: '🍗' }
+    ];
+
+    const extraFoods = ['🍎','🍓','🍪','🥒','🍰','🥥','🌽','🥔','🍕','🥨'];
+    const happyFaces = ['🎉','⭐','👏','😊','🌟'];
+    const oopsFaces = ['😯','🙂','👆'];
+    const crowns = ['🥉','🥈','🥇','🏆'];
 
     const scoreEl = document.getElementById('score');
+    const livesEl = document.getElementById('lives');
+    const comboEl = document.getElementById('combo');
     const restartBtn = document.getElementById('restartBtn');
     const startBtn = document.getElementById('startBtn');
     const startScreen = document.getElementById('startScreen');
     const playScreen = document.getElementById('playScreen');
-    const goalEmojiEl = document.getElementById('goalEmoji');
-    const optionsEl = document.getElementById('options');
+    const animalEmojiEl = document.getElementById('animalEmoji');
+    const wantEmojiEl = document.getElementById('wantEmoji');
     const messageEl = document.getElementById('message');
+    const comboMessageEl = document.getElementById('comboMessage');
+    const foodsEl = document.getElementById('foods');
     const progressDotsEl = document.getElementById('progressDots');
+    const rewardScreenEl = document.getElementById('rewardScreen');
+    const stageEl = document.getElementById('stage');
 
     let score = 0;
+    let lives = 3;
+    let combo = 0;
     let round = 0;
     const totalRounds = 12;
-    let correctItem = '';
+    let currentAnimal = null;
     let locked = false;
 
     function shuffle(array) {
@@ -284,8 +354,19 @@
       return array[Math.floor(Math.random() * array.length)];
     }
 
-    function updateScore() {
+    function updateHud() {
       scoreEl.textContent = score;
+      livesEl.textContent = lives;
+      comboEl.textContent = combo;
+    }
+
+    function setMessage(text, color = '#333') {
+      messageEl.textContent = text;
+      messageEl.style.color = color;
+    }
+
+    function setComboMessage(text) {
+      comboMessageEl.textContent = text;
     }
 
     function renderDots() {
@@ -297,75 +378,125 @@
       }
     }
 
-    function setMessage(text, color = '#333') {
-      messageEl.textContent = text;
-      messageEl.style.color = color;
+    function burst(emoji) {
+      const el = document.createElement('div');
+      el.className = 'burst';
+      el.textContent = emoji;
+      el.style.left = `${20 + Math.random() * 60}%`;
+      el.style.top = `${35 + Math.random() * 20}%`;
+      stageEl.appendChild(el);
+      setTimeout(() => el.remove(), 800);
+    }
+
+    function getFoodChoices(correctFood) {
+      const pool = shuffle(extraFoods.filter(item => item !== correctFood));
+      const count = round >= 8 ? 6 : round >= 4 ? 5 : 4;
+      const choices = shuffle([correctFood, ...pool.slice(0, count - 1)]);
+      return choices;
     }
 
     function nextRound() {
+      if (lives <= 0) {
+        finishGame(false);
+        return;
+      }
+
       if (round >= totalRounds) {
-        finishGame();
+        finishGame(true);
         return;
       }
 
       locked = false;
-      setMessage('');
+      rewardScreenEl.style.display = 'none';
+      rewardScreenEl.innerHTML = '';
+      foodsEl.style.display = 'grid';
       round += 1;
       renderDots();
+      setMessage('');
+      setComboMessage(combo >= 2 ? '🔥'.repeat(Math.min(combo, 5)) : '');
 
-      const options = shuffle(items).slice(0, 4);
-      correctItem = randomItem(options);
-      goalEmojiEl.textContent = correctItem;
-      optionsEl.innerHTML = '';
+      currentAnimal = randomItem(animals);
+      animalEmojiEl.textContent = currentAnimal.emoji;
+      wantEmojiEl.textContent = currentAnimal.food;
 
-      options.forEach((item) => {
+      const choices = getFoodChoices(currentAnimal.food);
+      foodsEl.innerHTML = '';
+
+      choices.forEach((food) => {
         const btn = document.createElement('button');
-        btn.className = 'option';
-        btn.innerHTML = `<span class="option-emoji">${item}</span>`;
-        btn.addEventListener('click', () => handleChoice(item, btn));
-        optionsEl.appendChild(btn);
+        btn.className = 'food';
+        btn.innerHTML = `<span class="food-emoji">${food}</span>`;
+        btn.addEventListener('click', () => chooseFood(food, btn));
+        foodsEl.appendChild(btn);
       });
     }
 
-    function handleChoice(item, button) {
+    function chooseFood(food, button) {
       if (locked) return;
 
-      if (item === correctItem) {
+      if (food === currentAnimal.food) {
         locked = true;
-        score += 1;
-        updateScore();
+        combo += 1;
+        score += combo >= 3 ? 2 : 1;
+        updateHud();
         button.classList.add('correct');
-        setMessage(randomItem(successMessages), '#2f9e44');
-        setTimeout(nextRound, 700);
+        setMessage(randomItem(happyFaces), '#2f9e44');
+        setComboMessage(combo >= 2 ? '🔥 x' + combo : '');
+        burst('⭐');
+        if (combo >= 4) burst('🎉');
+        setTimeout(nextRound, 800);
       } else {
+        lives -= 1;
+        combo = 0;
+        updateHud();
         button.classList.add('wrong');
-        setMessage(randomItem(failMessages), '#e8590c');
+        setMessage(randomItem(oopsFaces), '#e8590c');
+        setComboMessage('');
+        burst('💨');
         setTimeout(() => {
           button.classList.remove('wrong');
-          setMessage('');
-        }, 450);
+          if (lives <= 0) {
+            finishGame(false);
+          }
+        }, 350);
       }
     }
 
-    function finishGame() {
+    function getRewardEmoji() {
+      if (score >= 16) return crowns[3];
+      if (score >= 12) return crowns[2];
+      if (score >= 8) return crowns[1];
+      return crowns[0];
+    }
+
+    function finishGame(win) {
       locked = true;
-      goalEmojiEl.textContent = score >= 9 ? '🏆' : '🎉';
-      optionsEl.innerHTML = '';
+      foodsEl.style.display = 'none';
+      animalEmojiEl.textContent = win ? '🥳' : '🙂';
+      wantEmojiEl.textContent = getRewardEmoji();
+      setMessage(win ? '🎉' : '💛', win ? '#2f9e44' : '#e67700');
+      setComboMessage('');
       renderDots();
 
-      const playAgain = document.createElement('button');
-      playAgain.className = 'start-btn';
-      playAgain.textContent = '▶ ЕЩЁ';
-      playAgain.addEventListener('click', startGame);
-      optionsEl.appendChild(playAgain);
+      rewardScreenEl.style.display = 'block';
+      rewardScreenEl.innerHTML = `
+        <div class="reward-big">${getRewardEmoji()}</div>
+        <button id="playAgainBtn" class="start-btn">▶ ЕЩЁ</button>
+      `;
+      document.getElementById('playAgainBtn').addEventListener('click', startGame);
 
-      setMessage('⭐ '.repeat(Math.max(1, Math.min(score, 6))), '#f59f00');
+      for (let i = 0; i < Math.min(score, 8); i++) {
+        setTimeout(() => burst('⭐'), i * 120);
+      }
     }
 
     function startGame() {
       score = 0;
+      lives = 3;
+      combo = 0;
       round = 0;
-      updateScore();
+      locked = false;
+      updateHud();
       startScreen.style.display = 'none';
       playScreen.style.display = 'block';
       nextRound();
@@ -373,7 +504,7 @@
 
     startBtn.addEventListener('click', startGame);
     restartBtn.addEventListener('click', startGame);
-    updateScore();
+    updateHud();
     renderDots();
   </script>
 </body>
