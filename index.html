@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Тап-Тап Зверята</title>
+  <style>
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(180deg, #8fd3ff 0%, #dff9ff 45%, #fff5c4 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 12px;
+      color: #2d2d2d;
+      touch-action: manipulation;
+    }
+
+    .game {
+      width: 100%;
+      max-width: 760px;
+      background: rgba(255, 255, 255, 0.96);
+      border-radius: 28px;
+      padding: 16px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.14);
+      text-align: center;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .stars {
+      font-size: 22px;
+      font-weight: bold;
+      background: #fff3b0;
+      border-radius: 999px;
+      padding: 10px 16px;
+      min-width: 120px;
+    }
+
+    .mini-btn {
+      border: none;
+      background: #74c0fc;
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 16px;
+      padding: 10px 16px;
+      cursor: pointer;
+    }
+
+    .scene {
+      background: linear-gradient(180deg, #eefcff 0%, #ffffff 100%);
+      border-radius: 24px;
+      padding: 14px 12px 18px;
+    }
+
+    .helper {
+      font-size: 42px;
+      margin-bottom: 8px;
+      animation: bounce 1.2s infinite;
+    }
+
+    .goal-wrap {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .goal-label {
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .goal-card {
+      width: 170px;
+      height: 170px;
+      border-radius: 26px;
+      background: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 10px 22px rgba(0,0,0,0.10);
+      border: 6px solid #ffd43b;
+      margin: 0 auto 8px;
+    }
+
+    .goal-emoji {
+      font-size: 96px;
+      line-height: 1;
+    }
+
+    .arrow {
+      font-size: 40px;
+      font-weight: bold;
+      color: #ff922b;
+      margin-bottom: 10px;
+    }
+
+    .options {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin-top: 8px;
+    }
+
+    .option {
+      border: none;
+      border-radius: 24px;
+      min-height: 150px;
+      background: #f8f9fa;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.10);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+      padding: 8px;
+    }
+
+    .option:active {
+      transform: scale(0.97);
+    }
+
+    .option.correct {
+      background: #d3f9d8;
+    }
+
+    .option.wrong {
+      background: #ffe3e3;
+    }
+
+    .option-emoji {
+      font-size: 82px;
+      line-height: 1;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    .message {
+      min-height: 52px;
+      font-size: 34px;
+      font-weight: bold;
+      margin-top: 14px;
+    }
+
+    .progress-dots {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #dee2e6;
+    }
+
+    .dot.done {
+      background: #ffd43b;
+    }
+
+    .start-screen {
+      padding: 18px 8px 8px;
+    }
+
+    .title {
+      font-size: 38px;
+      color: #ff6b6b;
+      margin: 0 0 8px;
+    }
+
+    .big-emoji-row {
+      font-size: 48px;
+      margin: 10px 0 16px;
+    }
+
+    .start-btn {
+      border: none;
+      background: linear-gradient(90deg, #51cf66, #94d82d);
+      color: white;
+      font-size: 30px;
+      font-weight: bold;
+      border-radius: 24px;
+      padding: 18px 28px;
+      min-width: 220px;
+      cursor: pointer;
+      box-shadow: 0 10px 18px rgba(0,0,0,0.14);
+    }
+
+    .small-help {
+      font-size: 18px;
+      color: #666;
+      margin-top: 14px;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+
+    @media (max-width: 640px) {
+      .title { font-size: 32px; }
+      .goal-card { width: 150px; height: 150px; }
+      .goal-emoji { font-size: 82px; }
+      .option { min-height: 130px; }
+      .option-emoji { font-size: 72px; }
+      .message { font-size: 28px; }
+      .goal-label { font-size: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="game">
+    <div class="topbar">
+      <div class="stars">⭐ <span id="score">0</span></div>
+      <button id="restartBtn" class="mini-btn">↻</button>
+    </div>
+
+    <div id="startScreen" class="start-screen">
+      <h1 class="title">Тап-Тап Зверята</h1>
+      <div class="big-emoji-row">🐶 🐱 🐸 🐰 ⭐</div>
+      <button id="startBtn" class="start-btn">▶ ИГРАТЬ</button>
+      <div class="small-help">Нажимай на такую же картинку</div>
+    </div>
+
+    <div id="playScreen" class="scene" style="display:none;">
+      <div class="helper">👇</div>
+      <div class="goal-wrap">
+        <div class="goal-label">Найди такую же</div>
+      </div>
+      <div class="goal-card">
+        <div id="goalEmoji" class="goal-emoji">🐶</div>
+      </div>
+      <div class="arrow">⬇</div>
+      <div id="options" class="options"></div>
+      <div id="message" class="message"></div>
+      <div id="progressDots" class="progress-dots"></div>
+    </div>
+  </div>
+
+  <script>
+    const items = ['🐶','🐱','🐭','🐸','🐰','🦊','🐻','🐼','🐵','🦁','🐷','🐹','🚗','🦋','🌈','⭐','🍎','🍌'];
+    const successMessages = ['⭐', '🎉', '👏', '😊', '🌟'];
+    const failMessages = ['🙂', '👆', '🔄'];
+
+    const scoreEl = document.getElementById('score');
+    const restartBtn = document.getElementById('restartBtn');
+    const startBtn = document.getElementById('startBtn');
+    const startScreen = document.getElementById('startScreen');
+    const playScreen = document.getElementById('playScreen');
+    const goalEmojiEl = document.getElementById('goalEmoji');
+    const optionsEl = document.getElementById('options');
+    const messageEl = document.getElementById('message');
+    const progressDotsEl = document.getElementById('progressDots');
+
+    let score = 0;
+    let round = 0;
+    const totalRounds = 12;
+    let correctItem = '';
+    let locked = false;
+
+    function shuffle(array) {
+      return [...array].sort(() => Math.random() - 0.5);
+    }
+
+    function randomItem(array) {
+      return array[Math.floor(Math.random() * array.length)];
+    }
+
+    function updateScore() {
+      scoreEl.textContent = score;
+    }
+
+    function renderDots() {
+      progressDotsEl.innerHTML = '';
+      for (let i = 0; i < totalRounds; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'dot' + (i < round ? ' done' : '');
+        progressDotsEl.appendChild(dot);
+      }
+    }
+
+    function setMessage(text, color = '#333') {
+      messageEl.textContent = text;
+      messageEl.style.color = color;
+    }
+
+    function nextRound() {
+      if (round >= totalRounds) {
+        finishGame();
+        return;
+      }
+
+      locked = false;
+      setMessage('');
+      round += 1;
+      renderDots();
+
+      const options = shuffle(items).slice(0, 4);
+      correctItem = randomItem(options);
+      goalEmojiEl.textContent = correctItem;
+      optionsEl.innerHTML = '';
+
+      options.forEach((item) => {
+        const btn = document.createElement('button');
+        btn.className = 'option';
+        btn.innerHTML = `<span class="option-emoji">${item}</span>`;
+        btn.addEventListener('click', () => handleChoice(item, btn));
+        optionsEl.appendChild(btn);
+      });
+    }
+
+    function handleChoice(item, button) {
+      if (locked) return;
+
+      if (item === correctItem) {
+        locked = true;
+        score += 1;
+        updateScore();
+        button.classList.add('correct');
+        setMessage(randomItem(successMessages), '#2f9e44');
+        setTimeout(nextRound, 700);
+      } else {
+        button.classList.add('wrong');
+        setMessage(randomItem(failMessages), '#e8590c');
+        setTimeout(() => {
+          button.classList.remove('wrong');
+          setMessage('');
+        }, 450);
+      }
+    }
+
+    function finishGame() {
+      locked = true;
+      goalEmojiEl.textContent = score >= 9 ? '🏆' : '🎉';
+      optionsEl.innerHTML = '';
+      renderDots();
+
+      const playAgain = document.createElement('button');
+      playAgain.className = 'start-btn';
+      playAgain.textContent = '▶ ЕЩЁ';
+      playAgain.addEventListener('click', startGame);
+      optionsEl.appendChild(playAgain);
+
+      setMessage('⭐ '.repeat(Math.max(1, Math.min(score, 6))), '#f59f00');
+    }
+
+    function startGame() {
+      score = 0;
+      round = 0;
+      updateScore();
+      startScreen.style.display = 'none';
+      playScreen.style.display = 'block';
+      nextRound();
+    }
+
+    startBtn.addEventListener('click', startGame);
+    restartBtn.addEventListener('click', startGame);
+    updateScore();
+    renderDots();
+  </script>
+</body>
+</html>
