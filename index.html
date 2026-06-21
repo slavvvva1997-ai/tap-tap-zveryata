@@ -3,14 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Покорми зверят</title>
+  <title>Весёлый парк</title>
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: linear-gradient(180deg, #92d8ff 0%, #e9fbff 45%, #fff0b3 100%);
+      background: linear-gradient(180deg, #8fd8ff 0%, #ebfbff 45%, #fff1b8 100%);
       min-height: 100vh;
       display: flex;
       justify-content: center;
@@ -19,10 +18,9 @@
       color: #2d2d2d;
       touch-action: manipulation;
     }
-
     .game {
       width: 100%;
-      max-width: 820px;
+      max-width: 860px;
       background: rgba(255,255,255,0.97);
       border-radius: 28px;
       padding: 14px;
@@ -30,7 +28,6 @@
       text-align: center;
       overflow: hidden;
     }
-
     .topbar {
       display: flex;
       justify-content: space-between;
@@ -39,20 +36,22 @@
       flex-wrap: wrap;
       margin-bottom: 10px;
     }
-
+    .left-pills, .right-pills {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
     .pill {
       padding: 10px 14px;
       border-radius: 999px;
       font-size: 22px;
       font-weight: bold;
       background: #fff3b0;
-      min-width: 90px;
+      min-width: 88px;
     }
-
-    .pill.hearts {
-      background: #ffe3e3;
-    }
-
+    .pill.hearts { background: #ffe3e3; }
+    .pill.game-name { background: #d0ebff; min-width: 120px; }
     .icon-btn {
       border: none;
       background: #74c0fc;
@@ -63,24 +62,20 @@
       padding: 10px 16px;
       cursor: pointer;
     }
-
     .start-screen, .scene {
       background: linear-gradient(180deg, #eefcff 0%, #ffffff 100%);
       border-radius: 24px;
       padding: 18px 12px;
     }
-
     .title {
-      font-size: 38px;
+      font-size: 40px;
       color: #ff6b6b;
       margin: 0 0 8px;
     }
-
     .big-row {
       font-size: 48px;
       margin: 12px 0 14px;
     }
-
     .start-btn {
       border: none;
       background: linear-gradient(90deg, #51cf66, #94d82d);
@@ -93,28 +88,44 @@
       cursor: pointer;
       box-shadow: 0 10px 18px rgba(0,0,0,0.14);
     }
-
     .hint {
       margin-top: 14px;
       font-size: 20px;
       color: #666;
     }
-
     .stage {
       position: relative;
       background: linear-gradient(180deg, #b2f2ff 0%, #d0f4de 60%, #b7e4a3 100%);
       border-radius: 24px;
-      padding: 16px 12px 20px;
-      min-height: 290px;
+      padding: 14px 12px 18px;
+      min-height: 420px;
       overflow: hidden;
     }
-
+    .message {
+      min-height: 40px;
+      font-size: 32px;
+      font-weight: bold;
+      margin: 4px 0 8px;
+    }
     .helper {
-      font-size: 36px;
+      font-size: 34px;
       animation: bounce 1s infinite;
       margin-bottom: 4px;
     }
-
+    .progress-row {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 8px 0 10px;
+    }
+    .dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #ced4da;
+    }
+    .dot.done { background: #ffd43b; }
     .animal-wrap {
       display: flex;
       justify-content: center;
@@ -123,10 +134,9 @@
       flex-wrap: wrap;
       margin-bottom: 10px;
     }
-
     .animal-card {
-      width: 190px;
-      height: 190px;
+      width: 180px;
+      height: 180px;
       border-radius: 30px;
       background: rgba(255,255,255,0.95);
       box-shadow: 0 10px 24px rgba(0,0,0,0.10);
@@ -134,58 +144,30 @@
       justify-content: center;
       align-items: center;
       border: 6px solid #ffd43b;
-      position: relative;
     }
-
-    .animal-emoji {
-      font-size: 110px;
-      line-height: 1;
-    }
-
+    .animal-emoji { font-size: 102px; line-height: 1; }
     .want-bubble {
       display: inline-flex;
       justify-content: center;
       align-items: center;
-      min-width: 90px;
-      min-height: 90px;
+      min-width: 88px;
+      min-height: 88px;
       background: white;
       border-radius: 999px;
       box-shadow: 0 6px 14px rgba(0,0,0,0.12);
-      font-size: 54px;
+      font-size: 52px;
       border: 4px solid #fab005;
     }
-
-    .progress-row {
-      display: flex;
-      justify-content: center;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-top: 12px;
-      margin-bottom: 10px;
-    }
-
-    .dot {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      background: #ced4da;
-    }
-
-    .dot.done {
-      background: #ffd43b;
-    }
-
     .foods {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 14px;
       margin-top: 8px;
     }
-
     .food {
       border: none;
       border-radius: 24px;
-      min-height: 130px;
+      min-height: 120px;
       background: #fff;
       box-shadow: 0 8px 18px rgba(0,0,0,0.10);
       display: flex;
@@ -194,113 +176,95 @@
       cursor: pointer;
       transition: transform 0.12s ease;
       padding: 8px;
+    }
+    .food:active { transform: scale(0.97); }
+    .food.correct { background: #d3f9d8; }
+    .food.wrong { background: #ffe3e3; }
+    .food-emoji { font-size: 74px; line-height: 1; user-select: none; pointer-events: none; }
+    .play-area {
       position: relative;
+      width: 100%;
+      height: 280px;
+      border-radius: 22px;
+      background: linear-gradient(180deg, #c5f6fa 0%, #d8f5a2 100%);
+      overflow: hidden;
+      box-shadow: inset 0 0 0 4px rgba(255,255,255,0.5);
     }
-
-    .food:active {
-      transform: scale(0.97);
-    }
-
-    .food.correct {
-      background: #d3f9d8;
-    }
-
-    .food.wrong {
-      background: #ffe3e3;
-    }
-
-    .food-emoji {
-      font-size: 78px;
-      line-height: 1;
+    .floating {
+      position: absolute;
+      width: 78px;
+      height: 78px;
+      border: none;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.95);
+      box-shadow: 0 8px 18px rgba(0,0,0,0.12);
+      font-size: 44px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
       user-select: none;
-      pointer-events: none;
     }
-
-    .message {
-      min-height: 44px;
-      font-size: 34px;
-      font-weight: bold;
-      margin-top: 10px;
-    }
-
-    .combo {
-      font-size: 24px;
-      font-weight: bold;
-      color: #f08c00;
-      min-height: 30px;
-    }
-
     .burst {
       position: absolute;
       font-size: 38px;
       animation: pop 0.8s ease forwards;
       pointer-events: none;
     }
-
-    .reward-screen {
-      padding: 10px 0 0;
-    }
-
-    .reward-big {
-      font-size: 80px;
-      margin-bottom: 8px;
-    }
-
+    .reward-screen { padding-top: 10px; }
+    .reward-big { font-size: 82px; margin-bottom: 8px; }
     @keyframes bounce {
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-6px); }
     }
-
     @keyframes pop {
       0% { transform: translateY(0) scale(0.8); opacity: 0; }
       30% { opacity: 1; }
       100% { transform: translateY(-50px) scale(1.2); opacity: 0; }
     }
-
     @media (max-width: 640px) {
       .title { font-size: 32px; }
-      .big-row { font-size: 42px; }
-      .animal-card { width: 160px; height: 160px; }
-      .animal-emoji { font-size: 92px; }
-      .want-bubble { min-width: 78px; min-height: 78px; font-size: 46px; }
-      .food { min-height: 118px; }
-      .food-emoji { font-size: 68px; }
+      .big-row { font-size: 40px; }
+      .pill { font-size: 19px; }
+      .stage { min-height: 430px; }
+      .animal-card { width: 150px; height: 150px; }
+      .animal-emoji { font-size: 88px; }
+      .want-bubble { min-width: 74px; min-height: 74px; font-size: 44px; }
+      .food { min-height: 108px; }
+      .food-emoji { font-size: 64px; }
       .message { font-size: 28px; }
-      .pill { font-size: 20px; }
-      .combo { font-size: 22px; }
+      .floating { width: 70px; height: 70px; font-size: 40px; }
+      .play-area { height: 260px; }
     }
   </style>
 </head>
 <body>
   <div class="game">
     <div class="topbar">
-      <div class="pill">⭐ <span id="score">0</span></div>
-      <div class="pill hearts">❤️ <span id="lives">3</span></div>
-      <div class="pill">🔥 <span id="combo">0</span></div>
-      <button id="restartBtn" class="icon-btn">↻</button>
+      <div class="left-pills">
+        <div class="pill">⭐ <span id="score">0</span></div>
+        <div class="pill hearts">❤️ <span id="lives">3</span></div>
+      </div>
+      <div class="right-pills">
+        <div class="pill game-name" id="gameLabel">🎮</div>
+        <button id="restartBtn" class="icon-btn">↻</button>
+      </div>
     </div>
 
     <div id="startScreen" class="start-screen">
-      <h1 class="title">Покорми зверят</h1>
-      <div class="big-row">🐰 🐵 🐻 🐶 🍎 🍌 🥕</div>
+      <h1 class="title">Весёлый парк</h1>
+      <div class="big-row">🐰 🎈 ⭐ 🐵 🫧 🐻</div>
       <button id="startBtn" class="start-btn">▶ ИГРАТЬ</button>
-      <div class="hint">Зверёк ждёт еду. Нажми на правильную.</div>
+      <div class="hint">Три игры подряд: корми, лопай, собирай</div>
     </div>
 
     <div id="playScreen" class="scene" style="display:none;">
       <div class="stage" id="stage">
         <div class="helper">👇</div>
-        <div class="animal-wrap">
-          <div class="animal-card">
-            <div id="animalEmoji" class="animal-emoji">🐰</div>
-          </div>
-          <div id="wantEmoji" class="want-bubble">🥕</div>
-        </div>
         <div id="message" class="message"></div>
-        <div id="comboMessage" class="combo"></div>
         <div id="progressDots" class="progress-row"></div>
+        <div id="gameContent"></div>
       </div>
-      <div id="foods" class="foods"></div>
       <div id="rewardScreen" class="reward-screen" style="display:none;"></div>
     </div>
   </div>
@@ -316,35 +280,34 @@
       { emoji: '🐼', food: '🎋' },
       { emoji: '🦊', food: '🍗' }
     ];
-
     const extraFoods = ['🍎','🍓','🍪','🥒','🍰','🥥','🌽','🥔','🍕','🥨'];
-    const happyFaces = ['🎉','⭐','👏','😊','🌟'];
-    const oopsFaces = ['😯','🙂','👆'];
-    const crowns = ['🥉','🥈','🥇','🏆'];
+    const balloonsGood = ['🎈','🫧','🎈','🫧','⭐'];
+    const balloonsBad = ['💨','☁️'];
+    const starsGood = ['⭐','🌟','✨'];
+    const starsBad = ['☁️','💨','🍂'];
+    const gameFlow = ['feed', 'balloons', 'stars'];
 
     const scoreEl = document.getElementById('score');
     const livesEl = document.getElementById('lives');
-    const comboEl = document.getElementById('combo');
+    const gameLabelEl = document.getElementById('gameLabel');
     const restartBtn = document.getElementById('restartBtn');
     const startBtn = document.getElementById('startBtn');
     const startScreen = document.getElementById('startScreen');
     const playScreen = document.getElementById('playScreen');
-    const animalEmojiEl = document.getElementById('animalEmoji');
-    const wantEmojiEl = document.getElementById('wantEmoji');
-    const messageEl = document.getElementById('message');
-    const comboMessageEl = document.getElementById('comboMessage');
-    const foodsEl = document.getElementById('foods');
-    const progressDotsEl = document.getElementById('progressDots');
-    const rewardScreenEl = document.getElementById('rewardScreen');
     const stageEl = document.getElementById('stage');
+    const messageEl = document.getElementById('message');
+    const progressDotsEl = document.getElementById('progressDots');
+    const gameContentEl = document.getElementById('gameContent');
+    const rewardScreenEl = document.getElementById('rewardScreen');
 
     let score = 0;
     let lives = 3;
-    let combo = 0;
-    let round = 0;
-    const totalRounds = 12;
+    let gameIndex = 0;
+    let phaseStep = 0;
     let currentAnimal = null;
     let locked = false;
+    let activeTimers = [];
+    let activeIntervals = [];
 
     function shuffle(array) {
       return [...array].sort(() => Math.random() - 0.5);
@@ -357,7 +320,8 @@
     function updateHud() {
       scoreEl.textContent = score;
       livesEl.textContent = lives;
-      comboEl.textContent = combo;
+      const labels = { feed: '🍎', balloons: '🎈', stars: '⭐' };
+      gameLabelEl.textContent = labels[gameFlow[gameIndex]] || '🎮';
     }
 
     function setMessage(text, color = '#333') {
@@ -365,147 +329,266 @@
       messageEl.style.color = color;
     }
 
-    function setComboMessage(text) {
-      comboMessageEl.textContent = text;
+    function clearAsync() {
+      activeTimers.forEach(clearTimeout);
+      activeIntervals.forEach(clearInterval);
+      activeTimers = [];
+      activeIntervals = [];
     }
 
-    function renderDots() {
+    function later(fn, ms) {
+      const id = setTimeout(fn, ms);
+      activeTimers.push(id);
+    }
+
+    function every(fn, ms) {
+      const id = setInterval(fn, ms);
+      activeIntervals.push(id);
+    }
+
+    function renderDots(total, done) {
       progressDotsEl.innerHTML = '';
-      for (let i = 0; i < totalRounds; i++) {
+      for (let i = 0; i < total; i++) {
         const dot = document.createElement('div');
-        dot.className = 'dot' + (i < round ? ' done' : '');
+        dot.className = 'dot' + (i < done ? ' done' : '');
         progressDotsEl.appendChild(dot);
       }
     }
 
-    function burst(emoji) {
+    function burst(emoji, x = 50, y = 45) {
       const el = document.createElement('div');
       el.className = 'burst';
       el.textContent = emoji;
-      el.style.left = `${20 + Math.random() * 60}%`;
-      el.style.top = `${35 + Math.random() * 20}%`;
+      el.style.left = `${x}%`;
+      el.style.top = `${y}%`;
       stageEl.appendChild(el);
-      setTimeout(() => el.remove(), 800);
+      later(() => el.remove(), 800);
     }
 
-    function getFoodChoices(correctFood) {
-      const pool = shuffle(extraFoods.filter(item => item !== correctFood));
-      const count = round >= 8 ? 6 : round >= 4 ? 5 : 4;
-      const choices = shuffle([correctFood, ...pool.slice(0, count - 1)]);
-      return choices;
-    }
-
-    function nextRound() {
+    function loseLife() {
+      lives -= 1;
+      if (lives < 0) lives = 0;
+      updateHud();
+      burst('💨');
       if (lives <= 0) {
-        finishGame(false);
-        return;
+        finishAll(false);
+        return true;
       }
+      return false;
+    }
 
-      if (round >= totalRounds) {
-        finishGame(true);
-        return;
+    function nextGameOrFinish() {
+      gameIndex += 1;
+      phaseStep = 0;
+      if (gameIndex >= gameFlow.length) {
+        finishAll(true);
+      } else {
+        startCurrentGame();
       }
+    }
 
+    function startCurrentGame() {
+      clearAsync();
       locked = false;
       rewardScreenEl.style.display = 'none';
       rewardScreenEl.innerHTML = '';
-      foodsEl.style.display = 'grid';
-      round += 1;
-      renderDots();
-      setMessage('');
-      setComboMessage(combo >= 2 ? '🔥'.repeat(Math.min(combo, 5)) : '');
+      gameContentEl.innerHTML = '';
+      updateHud();
 
+      const current = gameFlow[gameIndex];
+      if (current === 'feed') startFeedGame();
+      if (current === 'balloons') startBalloonGame();
+      if (current === 'stars') startStarGame();
+    }
+
+    function startFeedGame() {
+      renderDots(4, phaseStep);
+      setMessage('🍎', '#2f9e44');
       currentAnimal = randomItem(animals);
-      animalEmojiEl.textContent = currentAnimal.emoji;
-      wantEmojiEl.textContent = currentAnimal.food;
+      const choices = shuffle([currentAnimal.food, ...shuffle(extraFoods).slice(0, 3)]);
 
-      const choices = getFoodChoices(currentAnimal.food);
-      foodsEl.innerHTML = '';
+      gameContentEl.innerHTML = `
+        <div class="animal-wrap">
+          <div class="animal-card"><div class="animal-emoji">${currentAnimal.emoji}</div></div>
+          <div class="want-bubble">${currentAnimal.food}</div>
+        </div>
+        <div class="foods" id="foods"></div>
+      `;
 
+      const foodsEl = document.getElementById('foods');
       choices.forEach((food) => {
         const btn = document.createElement('button');
         btn.className = 'food';
         btn.innerHTML = `<span class="food-emoji">${food}</span>`;
-        btn.addEventListener('click', () => chooseFood(food, btn));
+        btn.addEventListener('click', () => {
+          if (locked) return;
+          if (food === currentAnimal.food) {
+            locked = true;
+            score += 2;
+            updateHud();
+            btn.classList.add('correct');
+            burst('⭐');
+            phaseStep += 1;
+            if (phaseStep >= 4) {
+              later(nextGameOrFinish, 700);
+            } else {
+              later(() => {
+                locked = false;
+                startFeedGame();
+              }, 650);
+            }
+          } else {
+            btn.classList.add('wrong');
+            setMessage('🙂', '#e8590c');
+            later(() => {
+              btn.classList.remove('wrong');
+              setMessage('🍎', '#2f9e44');
+            }, 350);
+            loseLife();
+          }
+        });
         foodsEl.appendChild(btn);
       });
     }
 
-    function chooseFood(food, button) {
-      if (locked) return;
+    function startBalloonGame() {
+      renderDots(8, phaseStep);
+      setMessage('🎈', '#d6336c');
+      gameContentEl.innerHTML = `<div class="play-area" id="playArea"></div>`;
+      const area = document.getElementById('playArea');
+      let spawned = 0;
+      let poppedGood = 0;
 
-      if (food === currentAnimal.food) {
-        locked = true;
-        combo += 1;
-        score += combo >= 3 ? 2 : 1;
-        updateHud();
-        button.classList.add('correct');
-        setMessage(randomItem(happyFaces), '#2f9e44');
-        setComboMessage(combo >= 2 ? '🔥 x' + combo : '');
-        burst('⭐');
-        if (combo >= 4) burst('🎉');
-        setTimeout(nextRound, 800);
-      } else {
-        lives -= 1;
-        combo = 0;
-        updateHud();
-        button.classList.add('wrong');
-        setMessage(randomItem(oopsFaces), '#e8590c');
-        setComboMessage('');
-        burst('💨');
-        setTimeout(() => {
-          button.classList.remove('wrong');
-          if (lives <= 0) {
-            finishGame(false);
+      function spawnBalloon() {
+        if (spawned >= 8 || lives <= 0 || gameFlow[gameIndex] !== 'balloons') return;
+        spawned += 1;
+        const good = Math.random() > 0.25;
+        const emoji = good ? randomItem(balloonsGood) : randomItem(balloonsBad);
+        const btn = document.createElement('button');
+        btn.className = 'floating';
+        btn.textContent = emoji;
+        btn.style.left = `${Math.random() * 78}%`;
+        btn.style.top = `${10 + Math.random() * 60}%`;
+        area.appendChild(btn);
+
+        btn.addEventListener('click', () => {
+          if (!btn.isConnected) return;
+          btn.remove();
+          if (good) {
+            score += 1;
+            poppedGood += 1;
+            phaseStep = poppedGood;
+            updateHud();
+            renderDots(8, phaseStep);
+            burst('🎉', 50, 55);
+            if (poppedGood >= 8) {
+              clearAsync();
+              later(nextGameOrFinish, 700);
+            }
+          } else {
+            burst('💨', 50, 55);
+            loseLife();
           }
-        }, 350);
+        });
+
+        later(() => {
+          if (btn.isConnected) btn.remove();
+          if (spawned < 8 && gameFlow[gameIndex] === 'balloons') spawnBalloon();
+          else if (spawned >= 8 && poppedGood >= 8) later(nextGameOrFinish, 500);
+        }, 1400);
       }
+
+      every(spawnBalloon, 800);
+      spawnBalloon();
     }
 
-    function getRewardEmoji() {
-      if (score >= 16) return crowns[3];
-      if (score >= 12) return crowns[2];
-      if (score >= 8) return crowns[1];
-      return crowns[0];
+    function startStarGame() {
+      renderDots(10, phaseStep);
+      setMessage('⭐', '#f59f00');
+      gameContentEl.innerHTML = `<div class="play-area" id="playArea"></div>`;
+      const area = document.getElementById('playArea');
+      let shown = 0;
+      let caught = 0;
+
+      function spawnStar() {
+        if (shown >= 10 || lives <= 0 || gameFlow[gameIndex] !== 'stars') return;
+        shown += 1;
+        const good = Math.random() > 0.3;
+        const emoji = good ? randomItem(starsGood) : randomItem(starsBad);
+        const btn = document.createElement('button');
+        btn.className = 'floating';
+        btn.textContent = emoji;
+        btn.style.left = `${Math.random() * 78}%`;
+        btn.style.top = `${8 + Math.random() * 62}%`;
+        area.appendChild(btn);
+
+        btn.addEventListener('click', () => {
+          if (!btn.isConnected) return;
+          btn.remove();
+          if (good) {
+            score += 1;
+            caught += 1;
+            phaseStep = caught;
+            updateHud();
+            renderDots(10, phaseStep);
+            burst('⭐', 50, 55);
+            if (caught >= 10) {
+              clearAsync();
+              later(() => finishAll(true), 700);
+            }
+          } else {
+            burst('💨', 50, 55);
+            loseLife();
+          }
+        });
+
+        later(() => {
+          if (btn.isConnected) btn.remove();
+          if (shown >= 10 && caught >= 10) later(() => finishAll(true), 500);
+        }, 1300);
+      }
+
+      every(spawnStar, 700);
+      spawnStar();
     }
 
-    function finishGame(win) {
+    function finishAll(win) {
+      clearAsync();
       locked = true;
-      foodsEl.style.display = 'none';
-      animalEmojiEl.textContent = win ? '🥳' : '🙂';
-      wantEmojiEl.textContent = getRewardEmoji();
+      gameContentEl.innerHTML = '';
+      renderDots(3, win ? 3 : gameIndex);
       setMessage(win ? '🎉' : '💛', win ? '#2f9e44' : '#e67700');
-      setComboMessage('');
-      renderDots();
 
+      const reward = score >= 18 ? '🏆' : score >= 12 ? '🥇' : score >= 8 ? '🥈' : '🥉';
       rewardScreenEl.style.display = 'block';
       rewardScreenEl.innerHTML = `
-        <div class="reward-big">${getRewardEmoji()}</div>
+        <div class="reward-big">${win ? reward : '🙂'}</div>
         <button id="playAgainBtn" class="start-btn">▶ ЕЩЁ</button>
       `;
       document.getElementById('playAgainBtn').addEventListener('click', startGame);
 
-      for (let i = 0; i < Math.min(score, 8); i++) {
-        setTimeout(() => burst('⭐'), i * 120);
+      for (let i = 0; i < Math.min(score, 10); i++) {
+        later(() => burst(win ? '⭐' : '💛', 20 + Math.random() * 60, 35 + Math.random() * 20), i * 120);
       }
     }
 
     function startGame() {
+      clearAsync();
       score = 0;
       lives = 3;
-      combo = 0;
-      round = 0;
+      gameIndex = 0;
+      phaseStep = 0;
       locked = false;
-      updateHud();
       startScreen.style.display = 'none';
       playScreen.style.display = 'block';
-      nextRound();
+      updateHud();
+      startCurrentGame();
     }
 
     startBtn.addEventListener('click', startGame);
     restartBtn.addEventListener('click', startGame);
     updateHud();
-    renderDots();
+    renderDots(3, 0);
   </script>
 </body>
 </html>
