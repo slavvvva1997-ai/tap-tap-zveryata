@@ -418,6 +418,10 @@
       return themes[currentTheme];
     }
 
+    function saveUnlocks() {
+      localStorage.setItem('kid_game_unlocks', JSON.stringify(unlocked));
+    }
+
     function saveProgress() {
       localStorage.setItem('kid_game_progress', JSON.stringify(progress));
     }
