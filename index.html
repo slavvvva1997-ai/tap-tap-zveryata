@@ -818,11 +818,11 @@
       function maybeContinue() {
         if (!isRunning) return;
         if (goodHits >= target) {
-          later(() => finishAll(true), 650);
+          later(nextGameOrFinish, 650);
           return;
         }
         if (resolvedCount >= total) {
-          later(() => finishAll(true), 650);
+          later(nextGameOrFinish, 650);
           return;
         }
         spawnNext();
@@ -984,7 +984,7 @@
       isRunning = false;
       locked = true;
       gameContentEl.innerHTML = '';
-      renderDots(3, win ? 3 : gameIndex);
+      renderDots(gameFlow.length, win ? gameFlow.length : gameIndex);
       setMessage(win ? '🎉' : '💛', win ? '#2f9e44' : '#e67700');
 
       const themeData = getThemeProgress(currentTheme);
