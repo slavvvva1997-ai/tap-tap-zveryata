@@ -185,7 +185,28 @@
     .food:active { transform: scale(0.97); }
     .food.correct { background: #d3f9d8; }
     .food.wrong { background: #ffe3e3; }
-    .food-emoji { font-size: 74px; line-height: 1; user-select: none; pointer-events: none; }
+    .memory-grid, .match-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin-top: 10px;
+    }
+    .memory-card, .match-card {
+      border: none;
+      border-radius: 24px;
+      min-height: 110px;
+      background: #fff;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.10);
+      font-size: 64px;
+      cursor: pointer;
+    }
+    .memory-card.hidden, .match-card.hidden {
+      background: #74c0fc;
+      color: transparent;
+    }
+    .memory-card.done, .match-card.done {
+      background: #d3f9d8;
+    }
     .play-area {
       position: relative;
       width: 100%;
@@ -216,6 +237,16 @@
       font-size: 38px;
       animation: pop 0.8s ease forwards;
       pointer-events: none;
+    }
+    .reward-screen { padding-top: 10px; }
+    .reward-big { font-size: 82px; margin-bottom: 8px; }
+    .unlock-row {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 10px 0 14px;
+      font-size: 34px;
     }
     .map-wrap {
       margin-top: 14px;
@@ -379,7 +410,7 @@
       }
     };
 
-    const gameFlow = ['feed', 'balloons', 'stars'];
+    const gameFlow = ['feed', 'balloons', 'stars', 'memory', 'match'];
 
     const scoreEl = document.getElementById('score');
     const livesEl = document.getElementById('lives');
@@ -404,6 +435,8 @@
     let gameIndex = 0;
     let phaseStep = 0;
     let currentPair = null;
+    let openMemoryCards = [];
+    let openMatchCards = [];
     let locked = false;
     let activeTimers = [];
     let isRunning = false;
@@ -442,7 +475,7 @@
     function updateHud() {
       scoreEl.textContent = score;
       livesEl.textContent = lives;
-      const labels = { feed: '🍎', balloons: '🎈', stars: '⭐' };
+      const labels = { feed: '🍎', balloons: '🎈', stars: '⭐', memory: '🧠', match: '🧩' };
       gameLabelEl.textContent = labels[gameFlow[gameIndex]] || themes[currentTheme].label;
       soundBtn.classList.toggle('active', soundOn);
       soundBtn.textContent = soundOn ? '🔊' : '🔈';
@@ -602,6 +635,8 @@
       if (current === 'feed') startFeedGame();
       if (current === 'balloons') startBalloonGame();
       if (current === 'stars') startStarGame();
+      if (current === 'memory') startMemoryGame();
+      if (current === 'match') startMatchGame();
     }
 
     function startFeedGame() {
@@ -818,6 +853,120 @@
       }
 
       spawnNext();
+    }
+
+    function startMemoryGame() {
+      const target = currentDifficulty === 'easy' ? 2 : currentDifficulty === 'medium' ? 3 : 4;
+      renderDots(target, phaseStep);
+      setMessage('🧠', '#5f3dc4');
+      const pool = shuffle([...currentThemeData().collectGood, ...currentThemeData().popGood]).slice(0, target);
+      const cards = shuffle([...pool, ...pool]);
+      openMemoryCards = [];
+
+      gameContentEl.innerHTML = `<div class="memory-grid" id="memoryGrid"></div>`;
+      const grid = document.getElementById('memoryGrid');
+
+      cards.forEach((emoji, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'memory-card';
+        btn.textContent = emoji;
+        btn.dataset.value = emoji;
+        btn.dataset.index = index;
+        grid.appendChild(btn);
+      });
+
+      const all = [...grid.children];
+      all.forEach((btn) => btn.classList.remove('hidden'));
+      later(() => all.forEach((btn) => btn.classList.add('hidden')), 1200);
+
+      all.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          if (!isRunning || locked || btn.classList.contains('done') || !btn.classList.contains('hidden')) return;
+          btn.classList.remove('hidden');
+          openMemoryCards.push(btn);
+          if (openMemoryCards.length === 2) {
+            const [a, b] = openMemoryCards;
+            if (a.dataset.value === b.dataset.value) {
+              a.classList.add('done');
+              b.classList.add('done');
+              score += 2;
+              phaseStep += 1;
+              updateHud();
+              playGood();
+              burst('⭐');
+              openMemoryCards = [];
+              renderDots(target, phaseStep);
+              if (phaseStep >= target) later(nextGameOrFinish, 700);
+            } else {
+              locked = true;
+              later(() => {
+                a.classList.add('hidden');
+                b.classList.add('hidden');
+                openMemoryCards = [];
+                locked = false;
+              }, 700);
+            }
+          }
+        });
+      });
+    }
+
+    function startMatchGame() {
+      const target = currentDifficulty === 'easy' ? 2 : currentDifficulty === 'medium' ? 3 : 4;
+      renderDots(target, phaseStep);
+      setMessage('🧩', '#0b7285');
+      const pairs = shuffle(currentThemeData().feedPairs).slice(0, target);
+      const heroes = pairs.map(p => ({ type: 'hero', key: p.target, face: p.hero }));
+      const foods = pairs.map(p => ({ type: 'target', key: p.target, face: p.target }));
+      const cards = shuffle([...heroes, ...foods]);
+      openMatchCards = [];
+
+      gameContentEl.innerHTML = `<div class="match-grid" id="matchGrid"></div>`;
+      const grid = document.getElementById('matchGrid');
+
+      cards.forEach((item, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'match-card';
+        btn.textContent = item.face;
+        btn.dataset.key = item.key;
+        btn.dataset.type = item.type;
+        btn.dataset.index = index;
+        grid.appendChild(btn);
+      });
+
+      [...grid.children].forEach((btn) => {
+        btn.addEventListener('click', () => {
+          if (!isRunning || locked || btn.classList.contains('done') || btn.classList.contains('active')) return;
+          btn.classList.add('active');
+          openMatchCards.push(btn);
+          if (openMatchCards.length === 2) {
+            const [a, b] = openMatchCards;
+            const good = a.dataset.key === b.dataset.key && a.dataset.type !== b.dataset.type;
+            if (good) {
+              a.classList.add('done');
+              b.classList.add('done');
+              a.classList.remove('active');
+              b.classList.remove('active');
+              openMatchCards = [];
+              score += 2;
+              phaseStep += 1;
+              updateHud();
+              playGood();
+              burst('🎉');
+              renderDots(target, phaseStep);
+              if (phaseStep >= target) later(nextGameOrFinish, 700);
+            } else {
+              locked = true;
+              later(() => {
+                a.classList.remove('active');
+                b.classList.remove('active');
+                openMatchCards = [];
+                locked = false;
+              }, 700);
+            }
+          }
+        });
+      });
     }
 
     function applyUnlocks() {
